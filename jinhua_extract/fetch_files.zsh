@@ -11,8 +11,6 @@ files=(
   pytest.ini
   bootstrap_mac.sh
   install_mac_app.zsh
-  mac_app/发牌识别.app/Contents/Info.plist
-  mac_app/发牌识别.app/Contents/MacOS/run
   configs/playing_cards.yaml
   scripts/download_weights.py
   jinhua_extract/__init__.py

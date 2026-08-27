@@ -48,8 +48,14 @@ def iter_detections(
         fourcc = cv2.VideoWriter_fourcc(*"mp4v")
         writer = cv2.VideoWriter(str(annotate_path), fourcc, fps / max(frame_stride, 1), (w, h))
 
+    print(f"[detect] device={device} weights={weights}", flush=True)
+    print(f"[detect] classes={list(model.names.values())[:8]}... total={len(model.names)}", flush=True)
+    total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
+    print(f"[detect] video={video_path} frames={total} stride={frame_stride}", flush=True)
+
     detections: list[Detection] = []
     frame_idx = 0
+    infer_frames = 0
     while True:
         ok, frame = cap.read()
         if not ok:
@@ -58,6 +64,10 @@ def iter_detections(
             frame_idx += 1
             continue
         results = model.predict(frame, conf=conf, device=device, verbose=False)
+        infer_frames += 1
+        if infer_frames == 1 or infer_frames % 20 == 0:
+            nbox = 0 if results[0].boxes is None else len(results[0].boxes)
+            print(f"[detect] inferred {infer_frames} frames, last_boxes={nbox}", flush=True)
         result = results[0]
         names = result.names
         if result.boxes is not None:
@@ -74,4 +84,5 @@ def iter_detections(
     cap.release()
     if writer is not None:
         writer.release()
+    print(f"[detect] done frames={frame_idx} detections={len(detections)}", flush=True)
     return detections

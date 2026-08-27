@@ -16,14 +16,15 @@ def main() -> None:
     parser.add_argument("--players", type=int, default=4)
     parser.add_argument("--cards-each", type=int, default=3)
     parser.add_argument("--deal", choices=("round_robin", "stacked"), default="round_robin")
-    parser.add_argument("--conf", type=float, default=0.45)
-    parser.add_argument("--min-votes", type=int, default=3)
-    parser.add_argument("--frame-stride", type=int, default=1)
+    parser.add_argument("--conf", type=float, default=0.2)
+    parser.add_argument("--min-votes", type=int, default=1)
+    parser.add_argument("--frame-stride", type=int, default=2)
     parser.add_argument("--device", default=None)
     parser.add_argument("--json", dest="json_path", default=None)
     parser.add_argument("--annotate", default=None, help="可选：画出检测框的视频")
     args = parser.parse_args()
 
+    print(f"[cli] start video={args.video} weights={args.weights}", flush=True)
     detections = iter_detections(
         args.video,
         args.weights,
@@ -32,6 +33,11 @@ def main() -> None:
         device=args.device or pick_device(),
         annotate_path=args.annotate,
     )
+    from collections import Counter
+
+    labels = Counter(d.label for d in detections)
+    print(f"[cli] raw_detections={len(detections)} unique_labels={len(labels)}", flush=True)
+    print(f"[cli] top_labels={labels.most_common(20)}", flush=True)
     result = extract_from_detections(
         detections,
         num_cards=args.num_cards,
