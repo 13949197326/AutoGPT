@@ -59,7 +59,10 @@ cat > "${CMD}" <<EOF
 export HOME="\$HOME"
 /usr/bin/osascript <<'AS'
 try
-  do shell script "/bin/bash " & quoted form of (POSIX path of (path to home folder) & "jinhua_extract/mac_app/run.sh") with timeout 86400
+  set cmd to "/bin/bash " & quoted form of (POSIX path of (path to home folder) & "jinhua_extract/mac_app/run.sh")
+  with timeout of 86400 seconds
+    do shell script cmd
+  end timeout
   display notification "结果在 jinhua_extract/out" with title "发牌识别完成"
   do shell script "open " & quoted form of (POSIX path of (path to home folder) & "jinhua_extract/out")
 on error errMsg
