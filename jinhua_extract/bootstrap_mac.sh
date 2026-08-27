@@ -16,7 +16,7 @@ if [[ ! -d "${REPO_DIR}/jinhua_extract" ]]; then
     git fetch origin "${BRANCH}"
     git checkout "${BRANCH}"
   else
-    git clone -b "${BRANCH}" https://github.com/13949197326/AutoGPT.git "${REPO_DIR}"
+    git clone --depth 1 -b "${BRANCH}" https://github.com/13949197326/AutoGPT.git "${REPO_DIR}"
   fi
 fi
 
