@@ -7,6 +7,20 @@
 
 下面整段复制到终端，一行失败就停，把完整报错发回来。
 
+## 双击应用（环境已经装好之后）
+
+```bash
+cd ~/jinhua_extract
+curl -fL --retry 8 --retry-delay 3 -o install_mac_app.zsh "https://raw.githubusercontent.com/13949197326/AutoGPT/cursor/jinhua-video-extract-6437/jinhua_extract/install_mac_app.zsh"
+mkdir -p mac_app/发牌识别.app/Contents/MacOS
+curl -fL --retry 8 -o "mac_app/发牌识别.app/Contents/Info.plist" "https://raw.githubusercontent.com/13949197326/AutoGPT/cursor/jinhua-video-extract-6437/jinhua_extract/mac_app/发牌识别.app/Contents/Info.plist"
+curl -fL --retry 8 -o "mac_app/发牌识别.app/Contents/MacOS/run" "https://raw.githubusercontent.com/13949197326/AutoGPT/cursor/jinhua-video-extract-6437/jinhua_extract/mac_app/发牌识别.app/Contents/MacOS/run"
+chmod +x "mac_app/发牌识别.app/Contents/MacOS/run" install_mac_app.zsh
+zsh install_mac_app.zsh
+```
+
+之后 Dock 或「应用程序」里打开 **发牌识别**。默认用桌面上的 `deal.mp4`，也可把视频拖到图标上。不用每次 `source .venv`。
+
 ## 0. 推荐：终端里一次性粘贴（从家目录也可以）
 
 先执行 `deactivate`（如果你看到 `(.venv)` 且路径是 `~`）。然后整段粘贴：

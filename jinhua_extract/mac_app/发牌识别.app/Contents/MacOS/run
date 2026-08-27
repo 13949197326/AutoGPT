@@ -1,0 +1,81 @@
+#!/bin/bash
+set -u
+export PATH="/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin:$PATH"
+
+ROOT="${HOME}/jinhua_extract"
+PY="${ROOT}/.venv/bin/python"
+WEIGHTS="${ROOT}/models/playing-cards.pt"
+OUT_DIR="${ROOT}/out"
+LOG="${OUT_DIR}/last_run.log"
+DESKTOP_VIDEO="${HOME}/Desktop/deal.mp4"
+
+alert() {
+  /usr/bin/osascript -e "display alert \"$1\" message \"$2\" as informational"
+}
+
+fail() {
+  /usr/bin/osascript -e "display alert \"发牌识别失败\" message \"$1\" as critical"
+  exit 1
+}
+
+mkdir -p "${OUT_DIR}"
+
+if [[ ! -x "${PY}" ]]; then
+  fail "找不到环境：${PY}。请先在终端运行：cd ~/jinhua_extract && zsh bootstrap_mac.sh"
+fi
+if [[ ! -f "${WEIGHTS}" ]]; then
+  fail "找不到权重 ${WEIGHTS}。请先运行 bootstrap_mac.sh 下载模型。"
+fi
+
+VIDEO=""
+if [[ "${1:-}" != "" ]]; then
+  VIDEO="$1"
+elif [[ -f "${DESKTOP_VIDEO}" ]]; then
+  VIDEO="${DESKTOP_VIDEO}"
+else
+  VIDEO="$(/usr/bin/osascript <<'APPLESCRIPT'
+try
+  set theFile to choose file with prompt "选择发牌视频" of type {"public.mpeg-4", "public.movie", "com.apple.quicktime-movie"}
+  return POSIX path of theFile
+on error
+  return ""
+end try
+APPLESCRIPT
+)"
+fi
+
+VIDEO="$(echo "${VIDEO}" | tr -d '\r' | sed 's/[[:space:]]*$//')"
+if [[ -z "${VIDEO}" ]]; then
+  fail "没有选择视频。"
+fi
+if [[ ! -f "${VIDEO}" ]]; then
+  fail "视频不存在：${VIDEO}"
+fi
+
+cd "${ROOT}" || fail "无法进入 ${ROOT}"
+
+{
+  echo "=== $(date) ==="
+  echo "video=${VIDEO}"
+} >"${LOG}"
+set +e
+"${PY}" -m jinhua_extract.cli \
+  --video "${VIDEO}" \
+  --weights "${WEIGHTS}" \
+  --num-cards 12 \
+  --players 4 \
+  --deal round_robin \
+  --json "${OUT_DIR}/result.json" \
+  --annotate "${OUT_DIR}/annotated.mp4" >>"${LOG}" 2>&1
+STATUS=$?
+echo "exit=${STATUS}" >>"${LOG}"
+set -u
+
+if [[ ${STATUS} -ne 0 ]]; then
+  TAIL="$(tail -n 20 "${LOG}" | sed 's/"/\\"/g')"
+  fail "识别未完成。日志最后几行：${TAIL}"
+fi
+
+/usr/bin/open "${OUT_DIR}"
+/usr/bin/osascript -e "display notification \"结果在 jinhua_extract/out\" with title \"发牌识别完成\""
+exit 0
