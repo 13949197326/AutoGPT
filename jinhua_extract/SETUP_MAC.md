@@ -7,6 +7,31 @@
 
 下面整段复制到终端，一行失败就停，把完整报错发回来。
 
+## 0. 推荐：终端里一次性粘贴（从家目录也可以）
+
+先执行 `deactivate`（如果你看到 `(.venv)` 且路径是 `~`）。然后整段粘贴：
+
+```bash
+deactivate 2>/dev/null
+cd ~
+git clone -b cursor/jinhua-video-extract-6437 https://github.com/13949197326/AutoGPT.git
+cd ~/AutoGPT/jinhua_extract
+zsh bootstrap_mac.sh
+```
+
+若 `AutoGPT` 目录已经存在，不要再 clone，改成：
+
+```bash
+deactivate 2>/dev/null
+cd ~/AutoGPT
+git fetch origin cursor/jinhua-video-extract-6437
+git checkout cursor/jinhua-video-extract-6437
+cd jinhua_extract
+zsh bootstrap_mac.sh
+```
+
+**不要**在 `~`（`/Users/hong`）里执行 `pip install -r requirements.txt`：家目录那个文件是 gtts，不是本项目。
+
 ## 1. 看有没有 Python 3
 
 ```bash
