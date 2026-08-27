@@ -32,14 +32,16 @@
 
 YOLOv8 官方小模型和公开扑克检测权重都是直接下载，**没有权限申请、没有 OAuth、也不需要我这边点「申请你通过」**。安装 `ultralytics` 即表示接受其开源协议（AGPL）。
 
-在本机（M1）执行：
+在本机（M1）**不要**直接 `cd jinhua_extract`（家目录里默认没有这个文件夹），也**不要**用 `python`（这台 Mac 没有这个命令）。
+
+按 [SETUP_MAC.md](SETUP_MAC.md) 先 clone 仓库、用 `python3`。摘要：
 
 ```bash
-cd jinhua_extract
-python -m venv .venv
+cd ~/AutoGPT/jinhua_extract
+python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
-python scripts/download_weights.py --which both
+python3 -m pip install -r requirements.txt
+python3 scripts/download_weights.py --which both
 ```
 
 会得到：
